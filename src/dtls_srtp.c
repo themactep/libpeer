@@ -9,7 +9,7 @@
 #if CONFIG_MBEDTLS_DEBUG
 #include "mbedtls/debug.h"
 #endif
-#include "mbedtls/sha256.h"
+#include "mbedtls/md.h"
 #include "mbedtls/ssl.h"
 #include "ports.h"
 #include "socket.h"
@@ -45,12 +45,15 @@ static void dtls_srtp_x509_digest(const mbedtls_x509_crt* crt, char* buf) {
   int i;
   unsigned char digest[32];
 
-  mbedtls_sha256_context sha256_ctx;
-  mbedtls_sha256_init(&sha256_ctx);
-  mbedtls_sha256_starts(&sha256_ctx, 0);
-  mbedtls_sha256_update(&sha256_ctx, crt->raw.p, crt->raw.len);
-  mbedtls_sha256_finish(&sha256_ctx, digest);
-  mbedtls_sha256_free(&sha256_ctx);
+  // Use modern MD API instead of deprecated SHA256 functions
+  const mbedtls_md_info_t *md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+  mbedtls_md_context_t md_ctx;
+  mbedtls_md_init(&md_ctx);
+  mbedtls_md_setup(&md_ctx, md_info, 0);
+  mbedtls_md_starts(&md_ctx);
+  mbedtls_md_update(&md_ctx, crt->raw.p, crt->raw.len);
+  mbedtls_md_finish(&md_ctx, digest);
+  mbedtls_md_free(&md_ctx);
 
   for (i = 0; i < 32; i++) {
     snprintf(buf, 4, "%.2X:", digest[i]);
