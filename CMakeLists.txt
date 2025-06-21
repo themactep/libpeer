@@ -30,7 +30,13 @@ include_directories(${CMAKE_BINARY_DIR}/dist/include ${CMAKE_BINARY_DIR}/dist/in
 
 link_directories(${CMAKE_BINARY_DIR}/dist/lib)
 
-set(DEP_LIBS "srtp2" "usrsctp" "mbedtls" "mbedcrypto" "mbedx509" "cjson")
+# Find system mbedTLS libraries
+find_library(MBEDTLS_LIBRARY mbedtls)
+find_library(MBEDCRYPTO_LIBRARY mbedcrypto)
+find_library(MBEDX509_LIBRARY mbedx509)
+
+set(DEP_LIBS "srtp2" "usrsctp" "cjson")
+set(SYSTEM_LIBS ${MBEDTLS_LIBRARY} ${MBEDCRYPTO_LIBRARY} ${MBEDX509_LIBRARY})
 # Extended debug information (symbols, source code, and macro definitions)
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3")
