@@ -61,7 +61,7 @@ endif()
 add_definitions("-Wunused-variable -Werror=sequence-point -Werror=pointer-sign -Werror=return-type -Werror=sizeof-pointer-memaccess -Wincompatible-pointer-types -DHTTP_DO_NOT_USE_CUSTOM_CONFIG -DMQTT_DO_NOT_USE_CUSTOM_CONFIG")
 
 add_subdirectory(src)
-add_subdirectory(examples)
+# add_subdirectory(examples)
 
 if(ENABLE_TESTS)
   add_subdirectory(tests)
@@ -77,18 +77,7 @@ ExternalProject_Add(cjson
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
 )
 
-ExternalProject_Add(mbedtls
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/mbedtls
-  CMAKE_ARGS
-    -DCMAKE_C_FLAGS="-fPIC"
-    -DENABLE_TESTING=off
-    -DENABLE_PROGRAMS=off
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/dist
-    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-)
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/third_party/mbedtls/include/mbedtls/mbedtls_config.h INPUT_CONTENT)
-string(REPLACE "//#define MBEDTLS_SSL_DTLS_SRTP" "#define MBEDTLS_SSL_DTLS_SRTP" MODIFIED_CONTENT ${INPUT_CONTENT})
-file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/mbedtls/include/mbedtls/mbedtls_config.h ${MODIFIED_CONTENT})
+# Use system mbedTLS instead of bundled version
 
 ExternalProject_Add(srtp2
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/libsrtp

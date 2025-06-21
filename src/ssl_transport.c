@@ -79,7 +79,7 @@ int ssl_transport_connect(NetworkContext_t* net_ctx,
   mbedtls_ssl_conf_ca_chain(&net_ctx->conf, &net_ctx->cacert, NULL);
   */
 
-  mbedtls_ssl_conf_rng(&net_ctx->conf, mbedtls_ctr_drbg_random, &net_ctx->ctr_drbg);
+  // mbedtls_ssl_conf_rng removed in newer mbedTLS - RNG is set automatically
 
   if ((ret = mbedtls_ssl_setup(&net_ctx->ssl, &net_ctx->conf)) != 0) {
     LOGE("ssl setup error: -0x%x", (unsigned int)-ret);

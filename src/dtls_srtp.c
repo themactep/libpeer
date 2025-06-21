@@ -49,7 +49,7 @@ static void dtls_srtp_x509_digest(const mbedtls_x509_crt* crt, char* buf) {
   mbedtls_sha256_init(&sha256_ctx);
   mbedtls_sha256_starts(&sha256_ctx, 0);
   mbedtls_sha256_update(&sha256_ctx, crt->raw.p, crt->raw.len);
-  mbedtls_sha256_finish(&sha256_ctx, (unsigned char*)digest);
+  mbedtls_sha256_finish(&sha256_ctx, digest);
   mbedtls_sha256_free(&sha256_ctx);
 
   for (i = 0; i < 32; i++) {
@@ -124,7 +124,7 @@ static int dtls_srtp_selfsign_cert(DtlsSrtp* dtls_srtp) {
 
   mbedtls_x509write_crt_set_validity(&crt, "20180101000000", "20280101000000");
 
-  ret = mbedtls_x509write_crt_pem(&crt, cert_buf, 2 * RSA_KEY_LENGTH, mbedtls_ctr_drbg_random, &dtls_srtp->ctr_drbg);
+  ret = mbedtls_x509write_crt_pem(&crt, cert_buf, 2 * RSA_KEY_LENGTH);
 
   if (ret < 0) {
     LOGE("mbedtls_x509write_crt_pem failed -0x%.4x", (unsigned int)-ret);
@@ -180,7 +180,7 @@ int dtls_srtp_init(DtlsSrtp* dtls_srtp, DtlsSrtpRole role, void* user_data) {
 
   mbedtls_ssl_conf_own_cert(&dtls_srtp->conf, &dtls_srtp->cert, &dtls_srtp->pkey);
 
-  mbedtls_ssl_conf_rng(&dtls_srtp->conf, mbedtls_ctr_drbg_random, &dtls_srtp->ctr_drbg);
+  // mbedtls_ssl_conf_rng removed in newer mbedTLS - RNG is set automatically
 
   mbedtls_ssl_conf_read_timeout(&dtls_srtp->conf, 1000);
 
@@ -192,7 +192,7 @@ int dtls_srtp_init(DtlsSrtp* dtls_srtp, DtlsSrtpRole role, void* user_data) {
 
     mbedtls_ssl_cookie_init(&dtls_srtp->cookie_ctx);
 
-    mbedtls_ssl_cookie_setup(&dtls_srtp->cookie_ctx, mbedtls_ctr_drbg_random, &dtls_srtp->ctr_drbg);
+    mbedtls_ssl_cookie_setup(&dtls_srtp->cookie_ctx);
 
     mbedtls_ssl_conf_dtls_cookies(&dtls_srtp->conf, mbedtls_ssl_cookie_write, mbedtls_ssl_cookie_check, &dtls_srtp->cookie_ctx);
 
